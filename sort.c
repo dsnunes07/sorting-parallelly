@@ -26,13 +26,12 @@ void merge (int* set, int p, int q, int r) {
       right_index++;
     }
   }
-  print_array(set, p, r+1);
 }
 
 void print_array (int *arr, int start, int stop) {
   int i;
   for (i=start; i<stop; i++) {
-    printf("arr[%d]: %d\n", i, arr[i]);
+    printf("%d\n", arr[i]);
   }
 }
 
@@ -47,14 +46,38 @@ void print_array (int *arr, int start, int stop) {
 void merge_sort(int* set, int p, int r) {
   if (p < r) {
     int q = (p + r)/2;
-    printf("p: %d q: %d r: %d\n", p, q, r);
     merge_sort(set, p, q);
     merge_sort(set, q+1, r);
     merge(set, p, q, r);
   }
 }
+
+int* read_set (char* filename, int *size) {
+  
+  FILE *fptr = fopen(filename, "r"); // pointer to file
+  int* set = malloc(*size * sizeof(int)); // array containing values to be sorted
+  int n=0; // amount of values
+  char line[10]; // line buffer
+  while(fgets(line, sizeof line, fptr) != NULL) {
+    if (n == *size) {
+      *size *= 2;
+      set = realloc(set, 2 * n * sizeof(int));
+    }
+    set[n] = atoi(line);
+    n++;
+  }
+  *size = n;
+  //realloc(set, n * sizeof(int));
+  return set;
+}
 int main (int argc, char* argv[]) {
-  int arr[18] = {7, 23, 1, 3, 9, 1, 21, 88, 32, 90, 34, 56, 1, 32, 11233, 332, 9, 2};
-  merge_sort(arr, 0, 17);
-  print_array(arr, 0, 18);
+  if (argc < 2) {
+    printf("Usage: ./sort <filename>");
+    return -1;
+  }
+  char *filename = argv[1];
+  int set_size = 2;
+  int* set = read_set(filename, &set_size);
+  merge_sort(set, 0, set_size-1);
+  print_array(set, 0, set_size);
 }
